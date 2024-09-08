@@ -42,7 +42,7 @@ L2 distance: squared difference ( (크기가 같은 두 배열의 차)^2 )
 
 Decision Boundary: k=n일 때 어떤 포인트와 주위 n개의 포인트 사이의 L1 distance 혹은 L2 distance를 사용해서 vote 등을 통해 boundary 판별. (=> n이 크면 덜 noisy해짐.)
 	But K-Nearest Neighbors with pixel distance are never used
-		b/c distance metrics on pixels are not informative & very slow
+		bc distance metrics on pixels are not informative & very slow
 			ex) original image -> shift, tint, box(all same L2 distance)
 b/c curse of dimensionality: need exponentially increasing number of examples for higher dimensional data
 -	Consider normalizaing(정규화), dimension reduction, split train/validationsets, set best hyperparameters
