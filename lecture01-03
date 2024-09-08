@@ -1,1 +1,121 @@
+[1강] Course Introduction & Introduction to Computer Vision
+Q. What is Computer Vision?:
+A. Computer vision is an interdisciplinary scientific field that deals with how computers can gain high-level understanding from digital images or videos.
+-> Seeks to understand and automate tasks that the human visual system can do.
 
+Q. 앞으로 배울 내용 소개:
+A. Object Recognition(Image Classification)
+Action Recognition(Video Classification)
+Spatial Localization(이미지 위 대상의 위치)&Temporal Localization(타임라인에서 이미지 또는 대상의 위치)
+Segmentation(Semantic segmentation, Instance segmentation)
+Tracking
+Multimodal Learning(여러 종류의 데이터 융합: audio-visual, text-visual, image captioning, visual qna)
+Style Transfer
+Video Search&Discovery
+
+[2강] First Approaches for Image Classification
+An image is a 2-D matrix of integers.
+
+Challenges: Scale variation(같은 대상 다른 크기), Viewpoint variation(같은 대상 다른 시각), Background clutter(대상과 배경 경계 모호), Illumination(색), Occlusion(대상이 가려짐), Deformation(같은 대상의 다양한 형태), Intraclass variation(같은 범주 내 대상들의 생김새가 다름)
+
+Image Classification – single vs. multi-class classification?
+
+Machine Learning: Data-driven Approach
+1.	Collect a dataset of images and labels.
+2.	Use a machine learning algorithm to train a classifier.
+3.	Use the classifier to predict unseen images.	
+-> We need some similarity (or distance) metric between two images.
+
+def train(images, labels):
+	# some machine learning
+   return model
+
+def predict(model, image):
+	# use the model
+   return predicted_label
+
+First Classifier: Nearest Neighbor
+
+두 이미지(배열) 사이의 유사도 비교 방법:
+L1 distance: absolute difference ( |크기가 같은 두 배열의 차| )
+L2 distance: squared difference ( (크기가 같은 두 배열의 차)^2 )
+
+Decision Boundary: k=n일 때 어떤 포인트와 주위 n개의 포인트 사이의 L1 distance 혹은 L2 distance를 사용해서 vote 등을 통해 boundary 판별. (=> n이 크면 덜 noisy해짐.)
+	But K-Nearest Neighbors with pixel distance are never used
+		b/c distance metrics on pixels are not informative & very slow
+			ex) original image -> shift, tint, box(all same L2 distance)
+b/c curse of dimensionality: need exponentially increasing number of examples for higher dimensional data
+-	Consider normalizaing(정규화), dimension reduction, split train/validationsets, set best hyperparameters
+
+def train(images, labels):
+	# simply remembers all the training data
+	self.images = images
+self.labels = labels 		=> Memorize all the data and labels
+					Time complexity: O(1)
+   return model
+
+def predict(model, image):
+# assume that each image is vectorized to 1D
+min_dist = sys.maxint
+for i in range(self.images.shape[0]):
+   dist = np.sum(np.abs(self.images[i, :] – test_image))
+   if dist < min_dist:
+      min_dist = dist
+      min_index = i	=> Output the label of the most similar training example
+	Time complexity: O(n)
+   return predicted_label
+**Conclusion: Nearest Neighbor는 predict마다 n번의 계산을 수행해야 하므로 비효율적. (train의 time complexity가 높고 predict의 time complexity가 낮은 모델이 효율적임.)
+
+더 현명한 approach: Parametric Approach
+	Instead of memorizing all training examples, think of a function f that maps the input (image x: 32*32*3=3072 numbers) to the label scores (class y: 10 labels).
+
+Second Classifier: Linear Classifier (f = Wx)
+We need to determine the values in W, such that each class gets the highest score for correct images.
+ 
+:10 independent classifiers f (for each class)
+Weights or parameters W
+Bias b: affecting the output without interacting with the data x
+
+**Conclusion: What the linear classifier does
+	at training: learning the template from training data
+-	compares only to K classes, while kNN does to N training examples (K<<N)
+	at testing: performing the template matching with a new example
+
+Limitations: meaning of the score?
+
+[3강] Loss Functions & Optimization
+Let’s define how much we are confident that this image belongs to each class.
+
+Compare out estimation y_hat to ground truth level y, estimating how good/bad we are currently.(Loss Funtions)
+Update the parameters(W) based on this loss.(Optimization)
+[Loss Functions]
+1.	Sigmoid Function(이진 분류)
+   
+2.	Softmax Function(다중 분류)
+ 
+3.	Discriminatvie Setting
+	Binary classification: ground truth y={+1, -1}
+	Marigin-based loss: using y*y_hat
+-	Log Loss
+-	Exponential Loss
+-	Hinge Loss
+4.	Probabilistic Setting(확률)
+In this setting, the loss function basically compares two probability distributions.(ground truth and predicted)l
+	Binary classification: ground truth y={0, 1}
+	Extended to K > 2 classes: ground truth as an one-hot vector y = [0,0,0,0,1,0,0]
+-	Cross Entropy : measures the average number of bits needed to identify an event drawn from the set.
+ 
+-	Kullback-Leibler (KL) Divergence : measures how one probability distribution P is different from a reference probability distribution Q.
+ 
+[Optimization]
+Primitive ideas: exhaustive search, random search, visualization, greedy search(solving each variable one by one)
+Gradient Descent – following the slope
+	-Stochastic Gradient Descent
+	-Batch Gradient Descent
+
+[Evaluation Strategy]
+Split some portion of our data for test purpose(test data or eval data)
+Choosing Hyperparameters
+
+Cross Validation
+K-fold Cross Validation
